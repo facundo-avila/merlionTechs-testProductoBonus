@@ -40,10 +40,12 @@ const StockManagment = ()=>{
     const [showAviable, setShowAviable] = useState(null);
     const [showInCharge, setshowInCharge] = useState(null);
     const [showBroken, setshowBroken] = useState(null);
+    const [isUpdated, setIsUpdated] = useState(null);
 
     const [bucketList, setBucketList] = useState([]);
 
     const getBuckets = async () =>{
+        setIsUpdated(false);
         try{
             const bucketsData =  await fetch("http://localhost:9000/api/product-buckets",{
                 method: 'get', 
@@ -53,24 +55,34 @@ const StockManagment = ()=>{
                 })
             });
             const bucketsJson = await bucketsData.json();
+
+            bucketsJson.sort((a,b)=>{
+                return a.id - b.id;
+            })
+
             setBucketList(bucketsJson);
         }catch(error){
             console.error(error);
         }
     };
 
+    const setUpdate = (newValue) => {
+        setIsUpdated(newValue);
+    };
+
     useEffect(()=>{
         getBuckets();
-    }, []);
+    }, [isUpdated]);
 
     return(
         <div className={classes.root}>  
-            <Grid xs={12} className={classes.title}>
-                <Typography variant="h2" color="primary" >Control de Stock</Typography>
-            </Grid>
+            
 
              <Grid container spacing={3}>
-                
+                <Grid item xs={12} className={classes.title}>
+                    <Typography variant="h2" color="primary" >Control de Stock</Typography>
+                </Grid>
+
                 <Grid item xs={4}>
                     <Paper className={classes.paper} onClick={()=>{setShowAviable(true); setshowInCharge(false); setshowBroken(false)}}>Disponible</Paper>
                 </Grid>
@@ -84,8 +96,10 @@ const StockManagment = ()=>{
             </Grid>
 
             {!showAviable && !showInCharge && !showBroken ? (
-                <Grid xs={12} className={classes.title}>
-                    <Typography variant="h5" color="primary" >Seleccione una opción para ver el estados de sus productos.</Typography>    
+                <Grid container spacing={3}>
+                    <Grid item xs={12} className={classes.title}>
+                        <Typography variant="h5" color="primary" >Seleccione una opción para ver el estados de sus productos.</Typography>    
+                    </Grid>
                 </Grid>
             ) : (
                 showAviable ? (
@@ -106,7 +120,7 @@ const StockManagment = ()=>{
                             
                         </Grid>
 
-                        {bucketList.map((bucketItem) => <Product key={`aviable-${bucketItem.id}`} bucket={bucketItem} quantityType={config.bucketType.aviable}></Product>)}
+                        {bucketList.map((bucketItem) => <Product key={`aviable-${bucketItem.id}`} bucket={bucketItem} quantityType={config.bucketType.aviable} isUpdated={setUpdate}></Product>)}
                     </Box>
                     
                 ):(
@@ -128,7 +142,7 @@ const StockManagment = ()=>{
 
                             </Grid>
 
-                            {bucketList.map((bucketItem) => <Product key={`in-charge-${bucketItem.id}`} bucket={bucketItem} quantityType={config.bucketType.inCharge}></Product>)}
+                            {bucketList.map((bucketItem) => <Product key={`in-charge-${bucketItem.id}`} bucket={bucketItem} quantityType={config.bucketType.inCharge} isUpdated={setUpdate}></Product>)}
                         </Box>
                     ):(
                         <Box m={4}>
@@ -147,7 +161,7 @@ const StockManagment = ()=>{
                                 </Grid>
                                 
                             </Grid>
-                            {bucketList.map((bucketItem) => <Product key={`broken-${bucketItem.id}`} bucket={bucketItem} quantityType={config.bucketType.broken}></Product>)}
+                            {bucketList.map((bucketItem) => <Product key={`broken-${bucketItem.id}`} bucket={bucketItem} quantityType={config.bucketType.broken} isUpdated={setUpdate}></Product>)}
                         </Box>
                     )
                 )
