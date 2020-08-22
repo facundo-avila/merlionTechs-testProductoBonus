@@ -48,12 +48,15 @@ const StockManagment = ()=>{
 
     const classes = useStyles();
 
+    //Estado de los botones para visualizar los estados del producto.
     const [showAviable, setShowAviable] = useState(null);
     const [showInCharge, setshowInCharge] = useState(null);
     const [showBroken, setshowBroken] = useState(null);
 
+    //Estado para detectar si hubo movimiento de buckets del producto
     const [isUpdated, setIsUpdated] = useState(null);
 
+    //Lista de buckets de cada producto
     const [bucketList, setBucketList] = useState([]);
 
     const getBuckets = async () =>{

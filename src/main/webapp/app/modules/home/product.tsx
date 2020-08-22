@@ -38,11 +38,14 @@ const useStyles = makeStyles((theme) => ({
 
 const Product = ({bucket, quantityType, isUpdated}) => {
 
+    //Estado de la cantidad ingresada por input
     const [quantitySelected, setQuantitySelected] = useState(0);
+
     const [open, setOpen] = useState(false);
 
     const classes = useStyles();
 
+    //Suma unidades a Disponible y resta desde el origen por parametro
     const sendToAviable= (fromBucketType) =>{
         const bucketBody = {
             "availableToSellQuantity": bucket.availableToSellQuantity,
@@ -74,8 +77,8 @@ const Product = ({bucket, quantityType, isUpdated}) => {
         .catch(error => error);
     };
 
+    //Suma unidades a Encargado y resta desde el origen por parametro
     const sendToInCharge = (fromBucketType) =>{
-
         const bucketBody = {
             "availableToSellQuantity": bucket.availableToSellQuantity,
             "brokenQuantity": bucket.brokenQuantity,
@@ -107,6 +110,7 @@ const Product = ({bucket, quantityType, isUpdated}) => {
 
     };
 
+    //Suma unidades a Rotos y resta desde el origen por parametro
     const sendToBroken = (fromBucketType) =>{
         const bucketBody = {
             "availableToSellQuantity": bucket.availableToSellQuantity,
@@ -138,6 +142,7 @@ const Product = ({bucket, quantityType, isUpdated}) => {
         .catch(error => error);
     };
 
+    //Actualiza y limita las unidades ingresadas por input
     const handleInputChange = (event) => {
         const inputValue = Number(event.target.value);
 
@@ -146,13 +151,13 @@ const Product = ({bucket, quantityType, isUpdated}) => {
         setQuantitySelected(Number(event.target.value));
     };
 
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+        return;
+        }
 
-    setOpen(false);
-  };
+        setOpen(false);
+    };
 
 
     return(
