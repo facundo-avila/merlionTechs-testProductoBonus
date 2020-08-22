@@ -1,7 +1,15 @@
-import React,{useState, useEffect} from 'react';
+import React,{useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import{ Grid, Typography, Button, TextField, Box } from '@material-ui/core';
+import{ Grid, Typography, TextField, Fab, Snackbar } from '@material-ui/core';
+import MuiAlert from '@material-ui/lab/Alert';
 import config from './config';
+import BrokenImage from '@material-ui/icons/BrokenImage';
+import LocalShipping from '@material-ui/icons/LocalShipping';
+import CheckCircle from '@material-ui/icons/CheckCircle';
+
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -14,12 +22,24 @@ const useStyles = makeStyles((theme) => ({
     gridContainer: {
         borderTop: '2px solid #9e9e9e',
         textAlign: 'center',
+    },
+    primaryButton:{
+        background: '#2A6A9E',
+        color: 'white',
+        margin: theme.spacing(1),
+        '&:hover':{
+            background: '#5E99C5',
+        },
+    },
+    secondaryButton: {
+
     }
   }));
 
 const Product = ({bucket, quantityType, isUpdated}) => {
 
     const [quantitySelected, setQuantitySelected] = useState(0);
+    const [open, setOpen] = useState(false);
 
     const classes = useStyles();
 
@@ -50,7 +70,7 @@ const Product = ({bucket, quantityType, isUpdated}) => {
         };
 
         fetch("http://localhost:8080/api/product-buckets",putRequest)
-        .then(res => isUpdated(true))
+        .then(res => {isUpdated(true); setOpen(true)})
         .catch(error => error);
     };
 
@@ -82,7 +102,7 @@ const Product = ({bucket, quantityType, isUpdated}) => {
         };
 
         fetch("http://localhost:8080/api/product-buckets",putRequest)
-        .then(res => isUpdated(true))
+        .then(res => {isUpdated(true); setOpen(true)})
         .catch(error => error);
 
     };
@@ -114,7 +134,7 @@ const Product = ({bucket, quantityType, isUpdated}) => {
         };
 
         fetch("http://localhost:8080/api/product-buckets",putRequest)
-        .then(res => isUpdated(true))
+        .then(res => {isUpdated(true);setOpen(true)})
         .catch(error => error);
     };
 
@@ -126,9 +146,17 @@ const Product = ({bucket, quantityType, isUpdated}) => {
         setQuantitySelected(Number(event.target.value));
     };
 
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
 
 
     return(
+        
         <Grid container spacing={3} className={classes.gridContainer} justify="center" alignItems="center">
             <Grid item xs={3}>
                 <Typography variant="body1">{bucket.product.name}</Typography>
@@ -144,35 +172,39 @@ const Product = ({bucket, quantityType, isUpdated}) => {
             
                 {quantityType === config.bucketType.aviable ? (
                     <Grid item xs={3}>
-                        <Button variant="contained" color="primary" onClick={() => sendToInCharge(quantityType)}>
-                            Enviar a Entregados
-                        </Button>
-                        <Button variant="contained" color="secondary" onClick={() => sendToBroken(quantityType)}>
-                            Enviar a Rotos
-                        </Button>
+                         <Fab className={classes.primaryButton} aria-label="add" onClick={() => sendToInCharge(quantityType)}>
+                            <LocalShipping></LocalShipping>
+                        </Fab>
+                        <Fab color="default" aria-label="add" onClick={() => sendToBroken(quantityType)}>
+                            <BrokenImage></BrokenImage>
+                        </Fab>
                     </Grid>
                 ):(
                     quantityType === config.bucketType.inCharge ? (
                         <Grid item xs={3}>
-                            <Button variant="contained" color="primary" onClick={() => sendToAviable(quantityType)}>
-                                Enviar a Disponible
-                            </Button>
-                            <Button variant="contained" color="secondary" onClick={() => sendToBroken(quantityType)}>
-                                Enviar a Rotos
-                            </Button>
+                            <Fab className={classes.primaryButton} aria-label="add" onClick={() => sendToAviable(quantityType)}>
+                                <CheckCircle></CheckCircle>
+                            </Fab>
+                            <Fab color="default" aria-label="add" onClick={() => sendToBroken(quantityType)}>
+                                <BrokenImage></BrokenImage>
+                            </Fab>
                         </Grid>
                     ):(
                         <Grid item xs={3}>
-                            <Button variant="contained" color="primary" onClick={() => sendToAviable(quantityType)}>
-                                Enviar a Disponible
-                            </Button>
-                            <Button variant="contained" color="secondary" onClick={() => sendToInCharge(quantityType)}>
-                                Enviar a Entregados
-                            </Button>
+                            <Fab className={classes.primaryButton} aria-label="add" onClick={() => sendToAviable(quantityType)}>
+                                <CheckCircle></CheckCircle>
+                            </Fab>
+                            <Fab color="default" aria-label="add" onClick={() => sendToInCharge(quantityType)}>
+                                <LocalShipping></LocalShipping>
+                            </Fab>
                         </Grid>
                     )
                 )}
-              
+            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity="success">
+                    {`Los productos ${bucket.product.name} fueron despachados exitosamente`}
+                </Alert>
+            </Snackbar>
         </Grid>    
         
     )
